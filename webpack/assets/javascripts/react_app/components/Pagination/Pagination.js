@@ -8,6 +8,10 @@ import {
   getURIperPage,
   changeQuery,
 } from '../../common/urlHelpers';
+import {
+  useForemanSettings,
+  usePaginationOptions,
+} from '../../Root/Context/ForemanContext';
 import './pagination.scss';
 
 const Pagination = props => {
@@ -22,8 +26,10 @@ const Pagination = props => {
     ...otherProps
   } = props;
 
+  const { perPage } = useForemanSettings();
+  const perPageOptions = usePaginationOptions();
   const urlPage = getURIpage();
-  const urlPerPage = getURIperPage();
+  const urlPerPage = getURIperPage() || null;
   const className = isEmpty(data.classNames)
     ? 'col-md-12'
     : `col-md-12 ${data.classNames.pagination_classes}`;
@@ -34,10 +40,10 @@ const Pagination = props => {
         isEmpty(pagination)
           ? {
               page: urlPage,
-              perPage: urlPerPage || data.perPage,
-              perPageOptions: data.perPageOptions,
+              perPage: urlPerPage || perPage,
+              perPageOptions,
             }
-          : pagination
+          : { ...pagination, perPage: urlPerPage || perPage }
       }
       viewType={data.viewType}
       itemCount={data.itemCount}
@@ -58,7 +64,6 @@ Pagination.propTypes = {
     viewType: PropTypes.string,
     perPageOptions: PropTypes.arrayOf(PropTypes.number),
     itemCount: PropTypes.number,
-    perPage: PropTypes.number,
     classNames: PropTypes.shape({
       pagination_classes: PropTypes.string,
     }),
@@ -70,7 +75,6 @@ Pagination.propTypes = {
   disablePrev: PropTypes.bool,
   pagination: PropTypes.shape({
     page: PropTypes.number,
-    perPage: PropTypes.number,
     perPageOptions: PropTypes.arrayOf(PropTypes.number),
   }),
 };
